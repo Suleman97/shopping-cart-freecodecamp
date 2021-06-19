@@ -28,14 +28,40 @@ const App = () => {
     'products',
     getProducts
   );
-  console.log(data);
+  // console.log(data);
 
   const getTotalItems = (items: CartItemType[]) =>
     items.reduce((ack: number, item) => ack + item.amount, 0);
 
-  const handleAddToCart = (clickedItem: CartItemType) => null;
+  const handleAddToCart = (clickedItem: CartItemType) => {
+    setCartItems((prev) => {
+      // is item is present in cart?
+      const isItemPresent = prev.find((item) => item.id === clickedItem.id);
 
-  const handleRemovefromCart = () => null;
+      if (isItemPresent) {
+        return prev.map((item) =>
+          item.id === clickedItem.id
+            ? { ...item, amount: item.amount + 1 }
+            : item
+        );
+      }
+      //first timeitem added in cart
+      return [...prev, { ...clickedItem, amount: 1 }];
+    });
+  };
+
+  const handleRemovefromCart = (id: number) => {
+    setCartItems((prev) =>
+      prev.reduce((ack, item) => {
+        if (item.id === id) {
+          if (item.amount === 1) return ack;
+          return [...ack, { ...item, amount: item.amount - 1 }];
+        } else {
+          return [...ack, item];
+        }
+      }, [] as CartItemType[])
+    );
+  };
 
   if (isLoading) return <LinearProgress />;
 
